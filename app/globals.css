@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.sticky {
+  position: fixed;
+  top: 0;
+}
+
+::-webkit-scrollbar {
+  height: 7px;
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: white; /* Light gray Shopify background color */
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #c4c7cc; /* Shopify scrollbar color */
+  border-radius: 8px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #a0a4a8; /* Darker Shopify scrollbar color on hover */
+}
+
+body {
+  font-family: 'Noto Sans', sans-serif;
+}
+
+.inventory-table-row .icon {
+  opacity: 0;
+}
+.inventory-table-row:hover .icon {
+  opacity: 1;
+}
