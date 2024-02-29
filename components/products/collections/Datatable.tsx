@@ -31,6 +31,7 @@ export default function Datable({
   const router = useRouter();
 
   function MobileRow({ item: c }: RowProps<Collection>) {
+    console.log(c)
     return (
       <Link
         href={`/products/collections/${c._id}`}

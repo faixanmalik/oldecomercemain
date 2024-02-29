@@ -25,8 +25,8 @@ export default function CollectionsPage() {
           return res.json();
         })
         .then(data => {
-          console.log(data);
           setCollections(data);
+          setIsLoading(false)
         })
         .catch(error => {
           console.error("Error fetching collections:", error);
