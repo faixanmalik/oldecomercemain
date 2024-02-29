@@ -1,3 +1,5 @@
+"use client"
+import { useEffect, useState } from 'react';
 import Link from "next/link";
 import Datatable from "@/components/products/collections/Datatable";
 import FilledButton from "@/components/buttons/FilledButton";
@@ -7,23 +9,35 @@ import { Collection } from "@/types/collection";
 export const dynamic = "force-dynamic"
 
 export default async function CollectionsPage() {
-  try {
-    const res = await fetch(apiUrl("/api/products/collections"), {
-      cache: "no-cache",
-    });
-  
-    if (!res.ok) {
-      throw new Error("Failed to fetch");
-    }
-  
-    const collections: Collection[] = await res.json();
-    
-    // Process collections data
-  
-  } catch (error) {
-    console.error("An error occurred while fetching collections:", error);
-    // Handle the error gracefully, display a message to the user, or take other appropriate action
-  }
+
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch(apiUrl("/api/products/collections"), {
+          cache: "no-cache",
+        });
+        
+        if (!res.ok) {
+          throw new Error("Failed to fetch");
+        }
+
+        const collectionsData: Collection[] = await res.json();
+        setCollections(collectionsData);
+        setIsLoading(false);
+      } catch (error) {
+        setError("An error occurred while fetching collections.");
+        setIsLoading(false);
+        console.error("Error fetching collections:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   
 
   return (
@@ -36,7 +50,14 @@ export default async function CollectionsPage() {
         </FilledButton>
       </div>
 
-      <Datatable initialCollections={collections} salesChannels={[]} />
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p>{error}</p>
+      ) : (
+        <Datatable initialCollections={collections} salesChannels={[]} />
+      )}
+      
     </div>
   );
 }
