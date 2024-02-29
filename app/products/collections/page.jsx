@@ -10,9 +10,9 @@ export const dynamic = "force-dynamic"
 
 export default async function CollectionsPage() {
 
-  const [collections, setCollections] = useState<Collection[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [collections, setCollections] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,8 +24,9 @@ export default async function CollectionsPage() {
         if (!res.ok) {
           throw new Error("Failed to fetch");
         }
+        console.log(res)
 
-        const collectionsData: Collection[] = await res.json();
+        const collectionsData = await res.json();
         setCollections(collectionsData);
         setIsLoading(false);
       } catch (error) {
@@ -33,6 +34,16 @@ export default async function CollectionsPage() {
         setIsLoading(false);
         console.error("Error fetching collections:", error);
       }
+    };
+
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch("/api/products/collections");
+      const data = await res.json();
+      console.log(data);
+      setCollections(data);
     };
 
     fetchData();
