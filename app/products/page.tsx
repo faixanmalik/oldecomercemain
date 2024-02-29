@@ -1,3 +1,4 @@
+"use client"
 import FilledButton from "@/components/buttons/FilledButton";
 import Datatable from "@/components/products/Datatable";
 import ExportImportButtons from "@/components/products/ExportImportButtons";
