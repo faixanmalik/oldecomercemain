@@ -80,13 +80,15 @@ export default function ProductsPage() {
         setGiftCards(giftCardsData);
         setLoading(false);
       } catch (error) {
-        setError(error.message);
+        setError('error.message');
         setLoading(false);
       }
     }
 
     fetchData();
   }, []);
+
+  
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
