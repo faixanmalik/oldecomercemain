@@ -39,13 +39,24 @@ export default async function CollectionsPage() {
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await fetch("/api/products/collections");
-      const data = await res.json();
-      console.log(data);
-      setCollections(data);
+    const fetchData = () => {
+      fetch("/api/products/collections")
+        .then(res => {
+          if (!res.ok) {
+            throw new Error("Failed to fetch");
+          }
+          return res.json();
+        })
+        .then(data => {
+          console.log(data);
+          setCollections(data);
+        })
+        .catch(error => {
+          console.error("Error fetching collections:", error);
+          // Handle error state if necessary
+        });
     };
-
+  
     fetchData();
   }, []);
 
