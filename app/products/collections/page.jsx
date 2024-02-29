@@ -8,35 +8,12 @@ import { Collection } from "@/types/collection";
 
 export const dynamic = "force-dynamic"
 
-export default async function CollectionsPage() {
+export default function CollectionsPage() {
 
   const [collections, setCollections] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch(apiUrl("/api/products/collections"), {
-          cache: "no-cache",
-        });
-        
-        if (!res.ok) {
-          throw new Error("Failed to fetch");
-        }
-        console.log(res)
-
-        const collectionsData = await res.json();
-        setCollections(collectionsData);
-        setIsLoading(false);
-      } catch (error) {
-        setError("An error occurred while fetching collections.");
-        setIsLoading(false);
-        console.error("Error fetching collections:", error);
-      }
-    };
-
-  }, []);
 
   useEffect(() => {
     const fetchData = () => {
