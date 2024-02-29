@@ -80,7 +80,7 @@ export default function ProductsPage() {
         setGiftCards(giftCardsData);
         setLoading(false);
       } catch (error) {
-        setError('error.message');
+        setError(error.message);
         setLoading(false);
       }
     }
