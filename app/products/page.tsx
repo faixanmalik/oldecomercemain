@@ -3,39 +3,74 @@ import FilledButton from "@/components/buttons/FilledButton";
 import Datatable from "@/components/products/Datatable";
 import ExportImportButtons from "@/components/products/ExportImportButtons";
 import { apiUrl } from "@/lib/utils";
-import { Market } from "@/types/market";
-import { SalesChannel } from "@/types/salesChannel";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
+type SalesChannel = {
+  _id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type Market = {
+  _id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export const dynamic = "force-dynamic";
 
-const ProductsPage: React.FC = () => {
-  const [products, setProducts] = useState<any[]>([]);
-  const [vendors, setVendors] = useState<any[]>([]);
-  const [collections, setCollections] = useState<any[]>([]);
-  const [productTypes, setProductTypes] = useState<any[]>([]);
-  const [tags, setTags] = useState<any[]>([]);
-  const [giftCards, setGiftCards] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+export default function ProductsPage() {
+  const [products, setProducts] = useState([]);
+  const [vendors, setVendors] = useState([]);
+  const [collections, setCollections] = useState([]);
+  const [productTypes, setProductTypes] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [giftCards, setGiftCards] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    async function fetchData() {
       try {
         const requests = [
-          fetch(apiUrl("/api/products?fields=title,status,variants,createdAt,updatedAt,vendor,category,media"), { cache: "no-cache" }),
-          fetch(apiUrl("/api/vendors"), { cache: "no-cache" }),
+          // fetch(
+          //   apiUrl(
+          //     "/api/products?fields=title,status,variants,createdAt,updatedAt,vendor,category,media"
+          //   ),
+          //   { cache: "no-cache" }
+          // ),
+          // fetch(apiUrl("/api/vendors"), { cache: "no-cache" }),
           fetch(apiUrl("/api/products/collections"), { cache: "no-cache" }),
-          fetch(apiUrl("/api/products/types"), { cache: "no-cache" }),
-          fetch(apiUrl("/api/products/tags"), { cache: "no-cache" }),
-          fetch(apiUrl("/api/products/gift_cards"), { cache: "no-cache" }),
+          // fetch(apiUrl("/api/products/types"), { cache: "no-cache" }),
+          // fetch(apiUrl("/api/products/tags"), { cache: "no-cache" }),
+          // fetch(apiUrl("/api/products/gift_cards"), { cache: "no-cache" }),
         ];
 
-        const responses = await Promise.all(requests);
-        const data = await Promise.all(responses.map(response => response.json()));
+        const [
+          productsRes,
+          vendorsRes,
+          collectionsRes,
+          typesRes,
+          tagsRes,
+          giftCardsRes,
+        ] = await Promise.all(requests);
 
-        const [productsData, vendorsData, collectionsData, productTypesData, tagsData, giftCardsData] = data;
+        if (!productsRes.ok) throw new Error("Failed to load products");
+        if (!vendorsRes.ok) throw new Error("Failed to load vendors");
+        if (!collectionsRes.ok) throw new Error("Failed to load collections");
+        if (!typesRes.ok) throw new Error("Failed to load product types");
+        if (!tagsRes.ok) throw new Error("Failed to load tags");
+        if (!giftCardsRes.ok) throw new Error("Failed to load gift cards");
+
+        const productsData = await productsRes.json();
+        const vendorsData = await vendorsRes.json();
+        const collectionsData = await collectionsRes.json();
+        const productTypesData = await typesRes.json();
+        const tagsData = await tagsRes.json();
+        const giftCardsData = await giftCardsRes.json();
 
         setProducts(productsData);
         setVendors(vendorsData);
@@ -45,10 +80,10 @@ const ProductsPage: React.FC = () => {
         setGiftCards(giftCardsData);
         setLoading(false);
       } catch (error) {
-        setError("Failed to load data");
+        setError(error.message);
         setLoading(false);
       }
-    };
+    }
 
     fetchData();
   }, []);
@@ -95,10 +130,10 @@ const ProductsPage: React.FC = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen pt-6 md:pt-8 md:p-8">
-      <div className="mb-8 w-full flex justify-between px-4 md:px-0">
+      <div className=" mb-8 w-full flex justify-between px-4 md:px-0">
         <h1 className="text-xl font-bold text-[#1a1a1a]">Products</h1>
 
-        <div className="flex gap-2">
+        <div className=" flex gap-2">
           <ExportImportButtons />
           <FilledButton>
             <Link href="/products/new">Add Product</Link>
@@ -119,6 +154,4 @@ const ProductsPage: React.FC = () => {
       />
     </div>
   );
-};
-
-export default ProductsPage;
+}
