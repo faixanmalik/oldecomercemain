@@ -5,49 +5,55 @@ import { apiUrl } from "@/lib/utils";
 import { Market } from "@/types/market";
 import { SalesChannel } from "@/types/salesChannel";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 export const dynamic = "force-dynamic";
 
-export default async function ProductsPage() {
-  const requests = [
-    fetch(
-      apiUrl(
-        "/api/products?fields=title,status,variants,createdAt,updatedAt,vendor,category,media"
-      ),
-      { cache: "no-cache" }
-    ),
-    fetch(apiUrl("/api/vendors"), { cache: "no-cache" }),
-    fetch(apiUrl("/api/products/collections"), { cache: "no-cache" }),
-    fetch(apiUrl("/api/products/types"), { cache: "no-cache" }),
-    fetch(apiUrl("/api/products/tags"), { cache: "no-cache" }),
-    fetch(apiUrl("/api/products/gift_cards"), { cache: "no-cache" }),
-  ];
+const ProductsPage: React.FC = () => {
+  const [products, setProducts] = useState<any[]>([]);
+  const [vendors, setVendors] = useState<any[]>([]);
+  const [collections, setCollections] = useState<any[]>([]);
+  const [productTypes, setProductTypes] = useState<any[]>([]);
+  const [tags, setTags] = useState<any[]>([]);
+  const [giftCards, setGiftCards] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const [
-    productsRes,
-    vendorsRes,
-    collectionsRes,
-    typesRes,
-    tagsRes,
-    giftCardsRes,
-  ] = await Promise.all(requests);
-  if (!productsRes.ok) throw new Error("Failed to load products");
-  if (!vendorsRes.ok) throw new Error("Failed to load vendors");
-  if (!collectionsRes.ok) throw new Error("Failed to load collections");
-  if (!typesRes.ok) throw new Error("Failed to load product types");
-  if (!tagsRes.ok) throw new Error("Failed to load tags");
-  if (!giftCardsRes.ok) throw new Error("Failed to load gift cards");
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const requests = [
+          fetch(apiUrl("/api/products?fields=title,status,variants,createdAt,updatedAt,vendor,category,media"), { cache: "no-cache" }),
+          fetch(apiUrl("/api/vendors"), { cache: "no-cache" }),
+          fetch(apiUrl("/api/products/collections"), { cache: "no-cache" }),
+          fetch(apiUrl("/api/products/types"), { cache: "no-cache" }),
+          fetch(apiUrl("/api/products/tags"), { cache: "no-cache" }),
+          fetch(apiUrl("/api/products/gift_cards"), { cache: "no-cache" }),
+        ];
 
-  const [products, vendors, collections, productTypes, tags, giftCards] =
-    await Promise.all([
-      productsRes.json(),
-      vendorsRes.json(),
-      collectionsRes.json(),
-      typesRes.json(),
-      tagsRes.json(),
-      giftCardsRes.json(),
-    ]);
+        const responses = await Promise.all(requests);
+        const data = await Promise.all(responses.map(response => response.json()));
+
+        const [productsData, vendorsData, collectionsData, productTypesData, tagsData, giftCardsData] = data;
+
+        setProducts(productsData);
+        setVendors(vendorsData);
+        setCollections(collectionsData);
+        setProductTypes(productTypesData);
+        setTags(tagsData);
+        setGiftCards(giftCardsData);
+        setLoading(false);
+      } catch (error) {
+        setError("Failed to load data");
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   // TODO: fetch these from the API
   const statuses = ["active", "draft"];
@@ -88,10 +94,10 @@ export default async function ProductsPage() {
 
   return (
     <div className="bg-gray-100 min-h-screen pt-6 md:pt-8 md:p-8">
-      <div className=" mb-8 w-full flex justify-between px-4 md:px-0">
+      <div className="mb-8 w-full flex justify-between px-4 md:px-0">
         <h1 className="text-xl font-bold text-[#1a1a1a]">Products</h1>
 
-        <div className=" flex gap-2">
+        <div className="flex gap-2">
           <ExportImportButtons />
           <FilledButton>
             <Link href="/products/new">Add Product</Link>
@@ -112,4 +118,6 @@ export default async function ProductsPage() {
       />
     </div>
   );
-}
+};
+
+export default ProductsPage;
