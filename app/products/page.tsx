@@ -79,8 +79,8 @@ export default function ProductsPage() {
         setTags(tagsData);
         setGiftCards(giftCardsData);
         setLoading(false);
-      } catch (error) {
-        setError(error.message);
+      } catch (error: any) {
+        setError(error.message); // Type assertion to ensure error is treated as an Error object
         setLoading(false);
       }
     }
